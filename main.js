@@ -13,6 +13,12 @@ var game = {
       this.art.background = new Image();
 	  //Загружаем картинку
 	  this.art.background.src = "img/background.png"
+	  
+	  //Отрисовываем картинку
+	  then.context.drawImage(this.art.background,0,0);
+	  
+	  //Вывод изображения на экран
+	  window.requestAnimationFrame()
 	}
 };
 
