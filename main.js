@@ -6,7 +6,8 @@ var game = {
 	bat: undefined,
 	art: {
 		background: undefined,
-		bat: undefined
+		bat: undefined,
+		ball: undefined
 	},
 	
 	initialization(){
@@ -35,7 +36,8 @@ var game = {
 		this.context.clearRect(0,0, this.width, this.height);
 		//Отрисовываем картинку
 	    this.context.drawImage(this.art.background,0,0);
-		this.context.drawImage(this.art.bat,this.bat.x,this.bat.y);
+	    this.context.drawImage(this.art.bat, this.bat.x, this.bat.y);
+		this.context.drawImage(this.art.ball, this.ball.width * this.ball.part, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
 	},
 	
 	run: function(){
@@ -48,9 +50,18 @@ var game = {
 	}
 };
     game.bat = { 
-        x: 250,
+		x: 250,
 		y: 258,
 	};
+	
+	game.ball = {
+	    height: 19,
+		width: 19,
+		part: 0, 
+		x: 285,
+		y: 240,
+	};
+	
 
 // Запускать js код по факту загрузки html-страницы
     window.addEventListener("load",function(){
