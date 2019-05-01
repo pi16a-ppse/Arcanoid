@@ -6,6 +6,7 @@ var game = {
 	bat: undefined,
 	briksRows: 4,
 	briksCols: 8,
+	starting: true,
 	arrayBriks: [],
 	art: {
 		background: undefined,
@@ -90,6 +91,11 @@ var game = {
 	
 	//Обновить информацию
 	refresh: function(){
+		    //Проверка на столкновение с платформой
+			if(this.ball.colliding(this.bat)){
+				  this.ball.collideBat(this.bat);
+			}
+		
 	    	if(this.bat.speed){
 			    this.bat.move();
 		    }
@@ -112,17 +118,25 @@ var game = {
 		this.refresh();
 	    //нарисовать с учетом обновлений	
 		this.drawing();
+		
+		if(this.starting){
 			    //Вывод изображения на экран 
 	    window.requestAnimationFrame(function(){
 			//Повторить все это 
 			game.run();  
 		});
+		}
+
+	},
+	lose: function(){
+	    console.log("Game Over");
+		this.starting = false;
 	}
 };
 
 	game.ball = {
-	    height: 19,
-		width: 19,
+	    height: 18,
+		width: 18,
 		part: 0, 
 		x: 285,
 		y: 240,
@@ -158,6 +172,15 @@ var game = {
 			 this.speedY *= -1;
 			 briks.isAlive = false;
 		},
+		onTheLeftSide: function(bat){
+			//значение центра мяча меньше центра платформы
+			return (this.x + this.width / 2)  <  (bat.x + bat.width / 2);
+		},
+		
+		collideBat: function(bat){
+			this.speedY = -this.maxSpeed;
+			this.speedX = this.onTheLeftSide(bat) ? -this.maxSpeed : this.maxSpeed;  // На левой ли стороне произошло столкновение
+		},
 		checkBounds: function(){
 			//проверка выхода за пределы экрана
 			var nextX = this.x + this.speedX;
@@ -168,7 +191,7 @@ var game = {
 				this.speedX = this.maxSpeed;
 			}
 			else if(nextX + this.width > game.width){ // если мяч касается правой стороны
-				  this.x = game.width;
+				  this.x = game.width-this.width;
 				  this.speedX = -this.maxSpeed;
 			}
 			else if(nextY < 0){  // если мяч касается верхней стороны
@@ -176,7 +199,7 @@ var game = {
 				this.speedY = this.maxSpeed;
 			}
 			else if(nextY + this.height > game.height){
-				// Игрок проиграл
+				game.lose(); // игрок проиграл    
 			}
 		}
 
@@ -189,6 +212,8 @@ var game = {
 		maxSpeed: 6,
 		speed: 0,
 		ball: game.ball,
+		width: 85,
+		height: 18,
 		runBall: function(){
 			// мяч отскакивает от платформы
 			if(this.ball){
