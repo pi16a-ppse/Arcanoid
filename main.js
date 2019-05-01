@@ -112,6 +112,7 @@ var game = {
 		stop: function(){
 			//Останавливаем платформу
 			this.speed = 0;
+			
 		}
 	};
 	
