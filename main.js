@@ -101,21 +101,6 @@ var game = {
 	}
 };
 
-    game.bat = { 
-		x: 250,
-		y: 258,
-		maxSpeed: 6,
-		speed: 0,
-		move: function(){
-			this.x += this.speed;
-		},
-		stop: function(){
-			//Останавливаем платформу
-			this.speed = 0;
-			
-		}
-	};
-	
 	game.ball = {
 	    height: 19,
 		width: 19,
@@ -123,6 +108,31 @@ var game = {
 		x: 285,
 		y: 240,
 	};
+
+    game.bat = { 
+		x: 250,
+		y: 258,
+		maxSpeed: 6,
+		speed: 0,
+		ball: game.ball,
+		move: function(){
+			this.x += this.speed;
+			
+			//Если мяч на платформе
+			if(this.ball){
+				this.ball.x += this.speed;
+			}		
+		},
+		stop: function(){
+			//Останавливаем платформу
+			this.speed = 0;
+						//Если мяч на платформе
+			if(this.ball){
+				this.ball.speed = 0;
+			}		
+		}
+	};
+	
 	
 
 // Запускать js код по факту загрузки html-страницы
