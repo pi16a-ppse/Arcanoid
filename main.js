@@ -4,10 +4,14 @@ var game = {
 	height: 284,
     context: undefined,
 	bat: undefined,
+	briksRows: 4,
+	briksCols: 8,
+	arrayBriks: [],
 	art: {
 		background: undefined,
 		bat: undefined,
-		ball: undefined
+		ball: undefined,
+		briks: undefined
 	},
 	
 	initialization(){
@@ -24,9 +28,24 @@ var game = {
 		}
 	},
 	
+	buildLevel: function(){
+		//Вывод блоков
+		for(var rows = 0; rows < this.briksRows; rows++){
+			for(var cols = 0; cols < this.briksCols; cols++){
+				this.arrayBriks.push({
+					x: 58 * cols + 50,
+					y: 33 * rows + 30,
+					width: 54,
+					height: 27
+				});
+			}
+		}	
+	},
+	
 	start: function(){		
         this.initialization();
-		this.loadingImage();  
+		this.loadingImage();  	
+		this.buildLevel();
 		this.run();
 	  
 	},
@@ -38,6 +57,12 @@ var game = {
 	    this.context.drawImage(this.art.background,0,0);
 	    this.context.drawImage(this.art.bat, this.bat.x, this.bat.y);
 		this.context.drawImage(this.art.ball, this.ball.width * this.ball.part, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
+		
+		this.arrayBriks.forEach(function(element){
+			this.context.drawImage(this.art.briks, element.x, element.y);
+		}, this);
+		
+		
 	},
 	
 	run: function(){
