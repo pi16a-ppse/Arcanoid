@@ -119,7 +119,13 @@ var game = {
 		pushOf: function(){
 			this.speedX = -this.maxSpeed;
 			this.speedY = -this.maxSpeed;
-		}
+		},
+		//Изменение координаты мяча относительно скорости 
+		move: function(){
+			this.x += this.speedX;
+			this.y += this.speedY;
+		},
+		
 	};
 
     game.bat = { 
