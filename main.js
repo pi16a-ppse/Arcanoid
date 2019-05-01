@@ -18,6 +18,17 @@ var game = {
 	    //апи для отрисовки
         var canvas = document.getElementById("mycanvas"); 
         this.context = canvas.getContext("2d");
+		
+		//Событие нажатия на клавишу
+		window.addEventListener("keydown",function(evnt){
+		    //Проверяем какая клавиша нажата
+			if(evnt.keyCode == 37){ // нажата клавиша влево
+			    game.bat.speed = -game.bat.maxSpeed;
+			}
+			else if(evnt.keyCode == 39){ // нажата правая клавиша
+				game.bat.speed = game.bat.maxSpeed;
+			}
+		});
 	},
 	
 	loadingImage(){
@@ -66,6 +77,7 @@ var game = {
 	},
 	
 	run: function(){
+
 		this.drawing();
 			    //Вывод изображения на экран
 	    window.requestAnimationFrame(function(){
@@ -77,6 +89,8 @@ var game = {
     game.bat = { 
 		x: 250,
 		y: 258,
+		maxSpeed: 6,
+		speed: 0,
 	};
 	
 	game.ball = {
