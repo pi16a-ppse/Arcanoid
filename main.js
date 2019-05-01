@@ -103,6 +103,7 @@ var game = {
 				}
 			}
 		}, 	this);
+		this.ball.checkBounds();
 	},
 
 	
@@ -154,7 +155,29 @@ var game = {
 		collideBrik: function(briks){
 			 this.speedY *= -1;
 			 briks.isAlive = false;
+		},
+		checkBounds: function(){
+			//проверка выхода за пределы экрана
+			var nextX = this.x + this.speedX;
+			var nextY = this.y + this.speedY;
+			
+			if(nextX < 0){ // Если мяч касается левой стороны
+				this.x = 0;
+				this.speedX = this.maxSpeed;
+			}
+			else if(nextX + this.width > game.width){ // если мяч касается правой стороны
+				  this.x = game.width;
+				  this.speedX = -this.maxSpeed;
+			}
+			else if(nextY < 0){  // если мяч касается верхней стороны
+				this.y = 0;
+				this.speedY = this.maxSpeed;
+			}
+			else if(nextY + this.height > game.height){
+				// Игрок проиграл
+			}
 		}
+		
 	};
 
     game.bat = { 
