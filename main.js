@@ -121,8 +121,8 @@ var game = {
 };
 
 	game.ball = {
-	    height: 19,
-		width: 19,
+	    height: 30,
+		width: 30,
 		part: 0, 
 		x: 285,
 		y: 240,
