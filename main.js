@@ -28,6 +28,9 @@ var game = {
 			else if(evnt.keyCode == 39){ // нажата правая клавиша
 				game.bat.speed = game.bat.maxSpeed;
 			}
+			else if(evnt.keyCode == 32){ // нажатие пробела
+			    game.bat.runBall();
+			}
 		});
 		//Событие отпускания клавиши
 		window.addEventListener("keyup",function(evnt){
@@ -86,6 +89,14 @@ var game = {
 	    	if(this.bat.speed){
 			    this.bat.move();
 		    }
+			if(this.ball.speedX || this.ball.speedY){
+			    this.ball.move();
+		    }
+			this.arrayBriks.forEach(function(element){
+				if(this.ball.colliding(element)){
+				    this.ball.collideBrik(element);	
+				}
+		}, 	this);
 	},
 
 	
@@ -101,28 +112,65 @@ var game = {
 	}
 };
 
-    game.bat = { 
-		x: 250,
-		y: 258,
-		maxSpeed: 6,
-		speed: 0,
-		move: function(){
-			this.x += this.speed;
-		},
-		stop: function(){
-			//Останавливаем платформу
-			this.speed = 0;
-			
-		}
-	};
-	
 	game.ball = {
 	    height: 19,
 		width: 19,
 		part: 0, 
 		x: 285,
 		y: 240,
+		speedX: 0,
+		speedY: 0,
+		maxSpeed: 3,
+		pushOf: function(){
+			this.speedX = -this.maxSpeed;
+			this.speedY = -this.maxSpeed;
+		},
+		//Изменение координаты мяча относительно скорости 
+		move: function(){
+			this.x += this.speedX;
+			this.y += this.speedY;
+		},
+		//Столкновение мяча с элементом
+		colliding: function(element){
+			
+		}
+		collideBrik: function(briks){
+			 
+		}
 	};
+
+    game.bat = { 
+		x: 250,
+		y: 258,
+		maxSpeed: 6,
+		speed: 0,
+		ball: game.ball,
+		runBall: function(){
+			// мяч отскакивает от платформы
+			if(this.ball){
+				this.ball.pushOf();
+				// после того, как мяч взлетел
+				this.ball = false;
+			}
+		},
+		move: function(){
+			this.x += this.speed;
+			
+			//Если мяч на платформе
+			if(this.ball){
+				this.ball.x += this.speed;
+			}		
+		},
+		stop: function(){
+			//Останавливаем платформу
+			this.speed = 0;
+						//Если мяч на платформе
+			if(this.ball){
+				this.ball.speed = 0;
+			}		
+		}
+	};
+	
 	
 
 // Запускать js код по факту загрузки html-страницы
