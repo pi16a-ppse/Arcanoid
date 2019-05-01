@@ -1,4 +1,3 @@
-//Вывод фона на экран
 var game = {
 	width: 580,
 	height: 284,
@@ -7,6 +6,7 @@ var game = {
 	briksRows: 4,
 	briksCols: 8,
 	starting: true,
+	score: 0,
 	arrayBriks: [],
 	art: {
 		background: undefined,
@@ -15,11 +15,12 @@ var game = {
 		briks: undefined
 	},
 	
-	initialization(){
+	initialization() {
 	    //апи для отрисовки
         var canvas = document.getElementById("mycanvas"); 
         this.context = canvas.getContext("2d");
-		
+				this.context.font = "20 px Arial";
+		this.context.fillStyle = "#FFFFFF";	
 		//Событие нажатия на клавишу
 		window.addEventListener("keydown",function(evnt){
 		    //Проверяем какая клавиша нажата
@@ -39,8 +40,8 @@ var game = {
 		});
 	},
 	
-	loadingImage(){
-		for(var obj in this.art){
+	loadingImage() {
+		for(var obj in this.art) {
 		this.art[obj] = new Image();
 	    //Загружаем картинку
 	    this.art[obj].src = "img/" + obj +".png";
@@ -62,7 +63,7 @@ var game = {
 		}	
 	},
 	
-	start: function(){		
+	start: function() {		
         this.initialization();
 		this.loadingImage();  	
 		this.buildLevel();
@@ -70,42 +71,38 @@ var game = {
 	  
 	},
 	
-	drawing : function(){
+	drawing : function() {
 	    //Очищаем выбранную прямоугольную область
 		this.context.clearRect(0,0, this.width, this.height);
 		//Отрисовываем картинку
 	    this.context.drawImage(this.art.background,0,0);
 	    this.context.drawImage(this.art.bat, this.bat.x, this.bat.y);
 		this.context.drawImage(this.art.ball, this.ball.width * this.ball.part, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
-		
-		
 		this.arrayBriks.forEach(function(element){
 			if(element.isAlive){
 			this.context.drawImage(this.art.briks, element.x, element.y);
 			}
 		}, this);
-		
-		
+		this.context.fillText("SCORE: " + this.score, 15 ,this.height - 15);
 	},
-	
 	
 	//Обновить информацию
 	refresh: function(){
 		    //Проверка на столкновение с платформой
-			if(this.ball.colliding(this.bat)){
+			if(this.ball.colliding(this.bat)) {
 				  this.ball.collideBat(this.bat);
 			}
 		
-	    	if(this.bat.speed){
+	    	if(this.bat.speed) {
 			    this.bat.move();
 		    }
-			if(this.ball.speedX || this.ball.speedY){
+			if(this.ball.speedX || this.ball.speedY) {
 			    this.ball.move();
 		    }
 
-			this.arrayBriks.forEach(function(element){
-			if(element.isAlive){	
-				if(this.ball.colliding(element)){
+			this.arrayBriks.forEach(function(element) {
+			if(element.isAlive) {	
+				if(this.ball.colliding(element)) {
 				    this.ball.collideBrik(element);	
 				}
 			}
@@ -118,7 +115,6 @@ var game = {
 		this.refresh();
 	    //нарисовать с учетом обновлений	
 		this.drawing();
-		
 		if(this.starting){
 			    //Вывод изображения на экран 
 	    window.requestAnimationFrame(function(){
@@ -128,9 +124,11 @@ var game = {
 		}
 
 	},
-	lose: function(){
-	    console.log("Game Over");
+	finish: function(message){
+		alert(message);
 		this.starting = false;
+		//Перезагрузить
+		window.location.reload();
 	}
 };
 
@@ -146,13 +144,14 @@ var game = {
 		pushOf: function(){
 			this.speedX = -this.maxSpeed;
 			this.speedY = -this.maxSpeed;
+			
 		},
-		//Изменение координаты мяча относительно скорости 
+	
+				//Изменение координаты мяча относительно скорости 
 		move: function(){
 			this.x += this.speedX;
 			this.y += this.speedY;
 		},
-
 		//Столкновение мяча с элементом
 		colliding: function(element){
 			//координаты на следующем кадре анимации
@@ -171,6 +170,11 @@ var game = {
 		collideBrik: function(briks){
 			 this.speedY *= -1;
 			 briks.isAlive = false;
+			 ++game.score;
+			 
+			 if(game.score >= game.arrayBriks.length){
+				 game.finish("You Win!");
+			 }
 		},
 		onTheLeftSide: function(bat){
 			//значение центра мяча меньше центра платформы
@@ -199,7 +203,7 @@ var game = {
 				this.speedY = this.maxSpeed;
 			}
 			else if(nextY + this.height > game.height){
-				game.lose(); // игрок проиграл    
+				game.finish("Game Over!"); // игрок проиграл    
 			}
 		}
 
