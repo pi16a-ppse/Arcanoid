@@ -54,7 +54,8 @@ var game = {
 					x: 58 * cols + 50,
 					y: 33 * rows + 30,
 					width: 54,
-					height: 27
+					height: 27,
+					isAlive: true
 				});
 			}
 		}	
@@ -76,8 +77,11 @@ var game = {
 	    this.context.drawImage(this.art.bat, this.bat.x, this.bat.y);
 		this.context.drawImage(this.art.ball, this.ball.width * this.ball.part, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
 		
+		
 		this.arrayBriks.forEach(function(element){
+			if(element.isAlive){
 			this.context.drawImage(this.art.briks, element.x, element.y);
+			}
 		}, this);
 		
 		
@@ -93,9 +97,11 @@ var game = {
 			    this.ball.move();
 		    }
 			this.arrayBriks.forEach(function(element){
+			if(element.isAlive){	
 				if(this.ball.colliding(element)){
 				    this.ball.collideBrik(element);	
 				}
+			}
 		}, 	this);
 	},
 
@@ -132,10 +138,22 @@ var game = {
 		},
 		//Столкновение мяча с элементом
 		colliding: function(element){
+			//координаты на следующем кадре анимации
+			var nextX = this.x + this.speedX;
+			var nextY = this.y + this.speedY;
 			
-		}
+			if(nextX + this.width > element.x && 
+				nextX < element.x + element.width &&
+				nextY + this.height > element.y &&
+				nextY < element.y + element.height
+			){
+				return true;
+			}
+			return false;
+		},
 		collideBrik: function(briks){
-			 
+			 this.speedY *= -1;
+			 briks.isAlive = false;
 		}
 	};
 
