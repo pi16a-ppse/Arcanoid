@@ -29,6 +29,10 @@ var game = {
 				game.bat.speed = game.bat.maxSpeed;
 			}
 		});
+		//Событие отпускания клавиши
+		window.addEventListener("keyup",function(evnt){
+			game.bat.stop();
+		});
 	},
 	
 	loadingImage(){
@@ -76,21 +80,39 @@ var game = {
 		
 	},
 	
-	run: function(){
+	
+	//Обновить информацию
+	refresh: function(){
+	    	if(this.bat.speed){
+			    this.bat.move();
+		    }
+	},
 
+	
+	run: function(){
+		this.refresh();
+	    //нарисовать с учетом обновлений	
 		this.drawing();
-			    //Вывод изображения на экран
+			    //Вывод изображения на экран 
 	    window.requestAnimationFrame(function(){
-			//Зацикливаем перерисовку анимации
+			//Повторить все это 
 			game.run();  
 		});
 	}
 };
+
     game.bat = { 
 		x: 250,
 		y: 258,
 		maxSpeed: 6,
 		speed: 0,
+		move: function(){
+			this.x += this.speed;
+		},
+		stop: function(){
+			//Останавливаем платформу
+			this.speed = 0;
+		}
 	};
 	
 	game.ball = {
