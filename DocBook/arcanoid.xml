@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+
+<article xmlns="http://docbook.org/ns/docbook"
+    
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.1">
+    
+    <info>
+        
+        <title>Руководства программиста</title>
+        
+        <author>
+            
+            <personname>
+                
+                <firstname>Михайлов</firstname>
+                
+                <surname>Богдан</surname>
+                
+            </personname>
+            
+        </author>
+        
+    </info>
+    
+    <sect1>
+        
+        <title>Описание проекта</title>        
+        
+        <para>«Арканоид»</para>        
+        
+        <para>Арканоид — это классическая компьютерная игра, в которой нужно разбить все кирпичи на поле при помощи шарика, который игрок может отбивать битой. Если шарик проскочит мимо биты и уйдет за нижний край поля, игра проиграна. </para>
+             
+        
+        <mediaobject>
+            
+            <imageobject>
+                
+                <imagedata format="PNG" fileref="game.png"/>
+                
+            </imageobject>
+            
+        </mediaobject>
+        
+    </sect1>
+    
+    <sect1>
+        
+        <title>Детали реализации</title> 
+        
+        
+        
+        <para>Как реализована проверка выхода шарика за пределы экрана</para>
+        
+        
+        
+        <example>
+            
+            <title>Генерация реализована благодаря заранее созданному шаблону</title>
+            
+            <programlisting>
+
+<![CDATA[
+
+    var nextX = this.x + this.speedX;
+			var nextY = this.y + this.speedY;
+			if(nextX < 0) { // Если мяч касается левой стороны
+				this.x = 0;
+				this.speedX = this.maxSpeed;
+			}
+			else if(nextX + this.width > game.width) { // если мяч касается правой стороны
+				  this.x = game.width-this.width;
+				  this.speedX = -this.maxSpeed;
+			}
+			else if(nextY < 0) {  // если мяч касается верхней стороны
+				this.y = 0;
+				this.speedY = this.maxSpeed;
+			}
+			else if(nextY + this.height > game.height) {
+				game.finish("Game Over!"); // игрок проиграл
+			}
+
+                ]]>
+
+
+
+</programlisting>
+            
+        </example>
+        
+        <example>
+            
+            <title>Как проходит построение уровня</title>
+            
+            <programlisting><![CDATA[
+
+ for(var rows = 0; rows < this.briksRows; rows++) {
+			    for(var cols = 0; cols < this.briksCols; cols++) {
+				    this.arrayBriks.push({
+					x: 58 * cols + 50,
+					y: 33 * rows + 30,
+					width: 54,
+					height: 27,
+					isAlive: true
+				});
+			    }
+		    }
+
+                ]]></programlisting>
+            
+        </example>
+        
+        <example>
+            
+            <title>Как реализована проверка столкновения шарика с блоком</title>
+            
+            <programlisting><![CDATA[
+
+			var nextX = this.x + this.speedX;
+			var nextY = this.y + this.speedY;
+
+			if(nextX + this.width > element.x &&
+				nextX < element.x + element.width &&
+				nextY + this.height > element.y &&
+				nextY < element.y + element.height
+			) {
+				return true;
+			}
+			return false;
+
+                ]]></programlisting>
+            
+        </example>
+        
+    </sect1>
+    
+</article>
