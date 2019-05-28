@@ -1,254 +1,559 @@
+/**
+ * @file main2.js Описанисание main2.js
+ *
+ * @version 0.1
+ * @author Михайлов Богдан
+ * @copyright 2019
+ *
+ */
+
+/**
+ * Описание главное пространства имен
+ *
+ * @namespace game
+ *
+ */
 var game = {
-	width: 580,
-	height: 284,
+    /**
+    * Ширина канваса
+    * @memberof game
+    * @type Number
+    *
+    */
+    width: 580,
+    /**
+    * Высота канваса
+    * @memberof game
+    * @type Number
+    *
+    */
+    height: 284,
+    /**
+    *
+    * Апи для отрисовки
+    * @memberof game
+    * type Object
+    *
+    */
     context: undefined,
+    /**
+    *
+    * Платформа
+    * @memberof game
+    * type Object
+    *
+    */
 	bat: undefined,
-	briksRows: 4,
-	briksCols: 8,
-	starting: true,
-	score: 0,
-	arrayBriks: [],
-	art: {
-		background: undefined,
-		bat: undefined,
-		ball: undefined,
-		briks: undefined
-	},
-	
-	initialization() {
-	    //апи для отрисовки
-        var canvas = document.getElementById("mycanvas"); 
-        this.context = canvas.getContext("2d");
-				this.context.font = "20 px Arial";
-		this.context.fillStyle = "#FFFFFF";	
-		//Событие нажатия на клавишу
-		window.addEventListener("keydown",function(evnt){
-		    //Проверяем какая клавиша нажата
-			if(evnt.keyCode == 37){ // нажата клавиша влево
-			    game.bat.speed = -game.bat.maxSpeed;
-			}
-			else if(evnt.keyCode == 39){ // нажата правая клавиша
-				game.bat.speed = game.bat.maxSpeed;
-			}
-			else if(evnt.keyCode == 32){ // нажатие пробела
-			    game.bat.runBall();
-			}
-		});
-		//Событие отпускания клавиши
-		window.addEventListener("keyup",function(evnt){
-			game.bat.stop();
-		});
-	},
-	
-	loadingImage() {
-		for(var obj in this.art) {
-		this.art[obj] = new Image();
-	    //Загружаем картинку
-	    this.art[obj].src = "img/" + obj +".png";
-		}
-	},
-	
-	buildLevel: function(){
-		//Вывод блоков
-		for(var rows = 0; rows < this.briksRows; rows++){
-			for(var cols = 0; cols < this.briksCols; cols++){
-				this.arrayBriks.push({
-					x: 58 * cols + 50,
-					y: 33 * rows + 30,
-					width: 54,
-					height: 27,
-					isAlive: true
-				});
-			}
-		}	
-	},
-	
-	start: function() {		
-        this.initialization();
-		this.loadingImage();  	
-		this.buildLevel();
-		this.run();
-	  
-	},
-	
-	drawing : function() {
-	    //Очищаем выбранную прямоугольную область
-		this.context.clearRect(0,0, this.width, this.height);
-		//Отрисовываем картинку
-	    this.context.drawImage(this.art.background,0,0);
-	    this.context.drawImage(this.art.bat, this.bat.x, this.bat.y);
-		this.context.drawImage(this.art.ball, this.ball.width * this.ball.part, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
-		this.arrayBriks.forEach(function(element){
-			if(element.isAlive){
-			this.context.drawImage(this.art.briks, element.x, element.y);
-			}
-		}, this);
-		this.context.fillText("SCORE: " + this.score, 15 ,this.height - 15);
-	},
-	
-	//Обновить информацию
-	refresh: function(){
-		    //Проверка на столкновение с платформой
-			if(this.ball.colliding(this.bat)) {
-				  this.ball.collideBat(this.bat);
-			}
-		
-	    	if(this.bat.speed) {
-			    this.bat.move();
-		    }
-			if(this.ball.speedX || this.ball.speedY) {
-			    this.ball.move();
-		    }
-
-			this.arrayBriks.forEach(function(element) {
-			if(element.isAlive) {	
-				if(this.ball.colliding(element)) {
-				    this.ball.collideBrik(element);	
-				}
-			}
-		}, 	this);
-		this.ball.checkBounds();
-	},
-
-	
-	run: function(){
-		this.refresh();
-	    //нарисовать с учетом обновлений	
-		this.drawing();
-		if(this.starting){
-			    //Вывод изображения на экран 
-	    window.requestAnimationFrame(function(){
-			//Повторить все это 
-			game.run();  
-		});
-		}
-
-	},
-	finish: function(message){
-		alert(message);
-		this.starting = false;
-		//Перезагрузить
-		window.location.reload();
-	}
+    /**
+    *
+    * Количество строк блоков
+    * @memberof game
+    * @type Number
+    *
+    */
+    briksRows: 4,
+    /**
+    *
+    * Количество столбцов блоков
+    * @memberof game
+    * @type Number
+    *
+    */
+    briksCols: 8,
+    /**
+    *
+    * Началась ли игра?
+    * @memberof game
+    * @type Boolean
+    *
+    */
+    starting: true,
+    /**
+    * Игровой счет
+    * @memberof game
+    * @type Number
+    *
+    */
+    score: 0,
+    /**
+    *
+    * Массив блоков
+    * @memberof game
+    * @type {Array}
+    *
+    */
+    arrayBriks: [],
+    /**
+    *
+    * Графические компоненты
+    * @memberof game
+    * @type {object}
+    * @namespace game.art
+    *
+    */
+    art: {
+        /**
+        *
+        * Фон игры
+        * @memberof game.art
+        * @type {object}
+        *
+        */
+        background: undefined,
+        /**
+        *
+        * Компонет платформа
+        * @memberof game.art
+        * @type {object}
+        *
+        */
+        bat: undefined,
+        /**
+        *
+        * Компонет мяч
+        * @memberof game.art
+        * @type {object}
+        *
+        */
+        ball: undefined,
+        /**
+        *
+        * Компонет блок
+        * @memberof game.art
+        * @type {object}
+        *
+        */
+        briks: undefined
+    },
+        /**
+        *
+        * Метод Инициализации графических компонентов и подписка на события
+        * @memberof game
+        * @method initialization
+        *
+        */
+        initialization() {
+            var canvas = document.getElementById("mycanvas");
+            this.context = canvas.getContext("2d");
+            this.context.font = "20 px Arial";
+            this.context.fillStyle = "#FFFFFF";
+            window.addEventListener("keydown",function(evnt){
+                //Проверяем какая клавиша нажата
+                if(evnt.keyCode == 37) { // нажата клавиша влево
+                    game.bat.speed =- game.bat.maxSpeed;
+                } else if(evnt.keyCode == 39) { // нажата правая клавиша
+                    game.bat.speed = game.bat.maxSpeed;
+                } else if(evnt.keyCode == 32) { // нажатие пробела
+                    game.bat.runBall();
+                }
+            });
+            window.addEventListener("keyup",function(evnt){
+                game.bat.stop();
+            });
+        },
+        /**
+        *
+        * Метод загрузки графических компонентов
+        * @memberof game
+        * @method loadingImage
+        *
+        */
+        loadingImage() {
+            for(var obj in this.art) {
+                this.art[obj] = new Image();
+                //Загружаем картинку
+                this.art[obj].src = "img/" + obj +".png";
+            }
+        },
+        /**
+        *
+        * Метод построение уровня: добавление блоков в массив
+        * @memberof game
+        * @method buildLevel
+        *
+        */
+        buildLevel: function() {
+            for(var rows = 0; rows < this.briksRows; rows++) {
+                for(var cols = 0; cols < this.briksCols; cols++) {
+                    this.arrayBriks.push({
+                    x: 58 * cols + 50,
+                    y: 33 * rows + 30,
+                    width: 54,
+                    height: 27,
+                    isAlive: true
+                });
+                }
+            }
+        },
+        /**
+        *
+        * Метод запуска игры
+        * @memberof game
+        * @method start
+        *
+        */
+        start: function() {
+            this.initialization();
+            this.loadingImage();
+            this.buildLevel();
+            this.run();
+        },
+        /**
+        *
+        * Метод отрисовки картинки на экран
+        * @memberof game
+        * @method drawing
+        *
+        */
+        drawing : function() {
+            this.context.clearRect(0,0, this.width, this.height);
+            this.context.drawImage(this.art.background,0,0);
+            this.context.drawImage(this.art.bat, this.bat.x, this.bat.y);
+            this.context.drawImage(this.art.ball, this.ball.width * this.ball.part, 0, this.ball.width, this.ball.height, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
+            this.arrayBriks.forEach(function(element) {
+                if(element.isAlive) {
+                    this.context.drawImage(this.art.briks, element.x, element.y);
+                }
+        }, this);
+        this.context.fillText("SCORE: " + this.score, 15 ,this.height - 15);
+        },
+        /**
+        *
+        * Метод обновления картинки на экране
+        * @memberof game
+        * @method refresh
+        *
+        */
+        refresh: function() {
+        //Проверка на столкновение с платформой
+        if(this.ball.colliding(this.bat)) {
+            this.ball.collideBat(this.bat);
+        }
+        if(this.bat.speed) {
+            this.bat.move();
+        }
+        if(this.ball.speedX || this.ball.speedY) {
+            this.ball.move();
+        }
+        this.arrayBriks.forEach(function(element) {
+            if(element.isAlive) {
+                if(this.ball.colliding(element)) {
+                    this.ball.collideBrik(element);
+                }
+            }
+        }, this);
+        this.ball.checkBounds();
+        },
+        /**
+        *
+        * Метод зацикленный метод повторения перерисовки картинки
+        * @memberof game
+        * @method run
+        *
+        */
+        run: function() {
+            this.refresh();
+            //нарисовать с учетом обновлений
+            this.drawing();
+            if(this.starting){
+                //Вывод изображения на экран
+                window.requestAnimationFrame(function(){
+            //Повторить все это
+            game.run();
+            });
+            }
+        },
+        /**
+        *
+        * Метод завершения игры
+        * @memberof game
+        * @method finish
+        *
+        */
+        finish: function(message) {
+            alert(message);
+            this.starting = false;
+            //Перезагрузить
+            window.location.reload();
+        }
 };
+    /**
+    *
+    * Шарик
+    * @memberof game
+    * @type {object}
+    * @namespace game.ball
+    *
+    */
+    game.ball = {
+        /**
+        * Высота шарика
+        * @memberof game.ball
+        * @type Number
+        *
+        */
+        height: 18,
+        /**
+        * Ширина шарика
+        * @memberof game.ball
+        * @type Number
+        *
+        */
+        width: 18,
+        /**
+        * Номер кадра шарика
+        * @memberof game.ball
+        * @type Number
+        *
+        */
+        part: 0,
+        /**
+        * Текущая координата x шарика
+        * @memberof game.ball
+        * @type Number
+        *
+        */
+        x: 285,
+        /**
+        * Текущая координата y шарика
+        * @memberof game.ball
+        * @type Number
+        *
+        */
+        y: 240,
+        /**
+        * Текущая скоррость шарика по оси x
+        * @memberof game.ball
+        * @type Number
+        *
+        */
+        speedX: 0,
+        /**
+        * Текущая скоррость шарика по оси y
+        * @memberof game.ball
+        * @type Number
+        *
+        */
+        speedY: 0,
+        /**
+        * Максимальная скорость шарика
+        * @memberof game.ball
+        * @type Number
+        *
+        */
+        maxSpeed: 3,
+        /**
+        * Метод запуска мяча с платформы
+        * @memberof game.ball
+        * @method pushOf
+        *
+        */
+        pushOf: function() {
+            this.speedX = -this.maxSpeed;
+            this.speedY = -this.maxSpeed;
 
-	game.ball = {
-	    height: 18,
-		width: 18,
-		part: 0, 
-		x: 285,
-		y: 240,
-		speedX: 0,
-		speedY: 0,
-		maxSpeed: 3,
-		pushOf: function(){
-			this.speedX = -this.maxSpeed;
-			this.speedY = -this.maxSpeed;
-			
-		},
-	
-				//Изменение координаты мяча относительно скорости 
+        },
+        /**
+        * Метод столкновения мяча с элементом
+        * @memberof game.ball
+        * @method colliding
+        *
+        */
+        colliding: function(element) {
+            //координаты на следующем кадре анимации
+            var nextX = this.x + this.speedX;
+            var nextY = this.y + this.speedY;
+
+            if(nextX + this.width > element.x &&
+                nextX < element.x + element.width &&
+                nextY + this.height > element.y &&
+                nextY < element.y + element.height
+            ) {
+                return true;
+            }
+            return false;
+        },
+        /**
+        * Метод изменения координаты мяча относительно скорости
+        * @memberof game.ball
+        * @method colliding
+        *
+        */
 		move: function(){
 			this.x += this.speedX;
 			this.y += this.speedY;
 		},
-		//Столкновение мяча с элементом
-		colliding: function(element){
-			//координаты на следующем кадре анимации
-			var nextX = this.x + this.speedX;
-			var nextY = this.y + this.speedY;
-			
-			if(nextX + this.width > element.x && 
-				nextX < element.x + element.width &&
-				nextY + this.height > element.y &&
-				nextY < element.y + element.height
-			){
-				return true;
-			}
-			return false;
-		},
-		collideBrik: function(briks){
-			 this.speedY *= -1;
-			 briks.isAlive = false;
-			 ++game.score;
-			 
-			 if(game.score >= game.arrayBriks.length){
-				 game.finish("You Win!");
-			 }
-		},
-		onTheLeftSide: function(bat){
-			//значение центра мяча меньше центра платформы
-			return (this.x + this.width / 2)  <  (bat.x + bat.width / 2);
-		},
-		
-		collideBat: function(bat){
-			this.speedY = -this.maxSpeed;
-			this.speedX = this.onTheLeftSide(bat) ? -this.maxSpeed : this.maxSpeed;  // На левой ли стороне произошло столкновение
-		},
-		checkBounds: function(){
-			//проверка выхода за пределы экрана
-			var nextX = this.x + this.speedX;
-			var nextY = this.y + this.speedY;
-			
-			if(nextX < 0){ // Если мяч касается левой стороны
-				this.x = 0;
-				this.speedX = this.maxSpeed;
-			}
-			else if(nextX + this.width > game.width){ // если мяч касается правой стороны
-				  this.x = game.width-this.width;
-				  this.speedX = -this.maxSpeed;
-			}
-			else if(nextY < 0){  // если мяч касается верхней стороны
-				this.y = 0;
-				this.speedY = this.maxSpeed;
-			}
-			else if(nextY + this.height > game.height){
-				game.finish("Game Over!"); // игрок проиграл    
-			}
-		}
+        /**
+        * Метод столкновения мяча с блоком
+        * @memberof game.ball
+        * @method collideBrik
+        *
+        */
+        collideBrik: function(briks) {
+             this.speedY *= -1;
+             briks.isAlive = false;
+             ++game.score;
 
-		
-	};
-
-    game.bat = { 
-		x: 250,
-		y: 258,
-		maxSpeed: 6,
-		speed: 0,
-		ball: game.ball,
-		width: 85,
-		height: 18,
-		runBall: function(){
-			// мяч отскакивает от платформы
-			if(this.ball){
-				this.ball.pushOf();
-				// после того, как мяч взлетел
-				this.ball = false;
-			}
-		},
-		move: function(){
-			this.x += this.speed;
-			
-			//Если мяч на платформе
-			if(this.ball){
-				this.ball.x += this.speed;
-			}		
-		},
-		stop: function(){
-			//Останавливаем платформу
-			this.speed = 0;
-						//Если мяч на платформе
-			if(this.ball){
-				this.ball.speed = 0;
-			}		
-		}
-	};
-	
-	
-
-// Запускать js код по факту загрузки html-страницы
+             if(game.score >= game.arrayBriks.length) {
+                 game.finish("You Win!");
+             }
+        },
+        /**
+        * Метод отталкивания шарика от левой стороны платформы
+        * @memberof game.ball
+        * @method onTheLeftSide
+        *
+        */
+        onTheLeftSide: function(bat) {
+            //значение центра мяча меньше центра платформы
+            return (this.x + this.width / 2)  <  (bat.x + bat.width / 2);
+        },
+        /**
+        * Метод столкновения мяча с платформой
+        * @memberof game.ball
+        * @method collideBat
+        *
+        */
+        collideBat: function(bat) {
+            this.speedY = -this.maxSpeed;
+            this.speedX = this.onTheLeftSide(bat) ? -this.maxSpeed : this.maxSpeed;  // На левой ли стороне произошло столкновение
+        },
+        /**
+        * Метод проверки выхода шарика за пределы экрана
+        * @memberof game.ball
+        * @method checkBounds
+        *
+        */
+        checkBounds: function() {
+            var nextX = this.x + this.speedX;
+            var nextY = this.y + this.speedY;
+            if(nextX < 0) { // Если мяч касается левой стороны
+                this.x = 0;
+                this.speedX = this.maxSpeed;
+            } else if(nextX + this.width > game.width) { // если мяч касается правой стороны
+                  this.x = game.width-this.width;
+                  this.speedX = -this.maxSpeed;
+            } else if(nextY < 0) {  // если мяч касается верхней стороны
+                this.y = 0;
+                this.speedY = this.maxSpeed;
+            }
+            else if(nextY + this.height > game.height) {
+                game.finish("Game Over!"); // игрок проиграл
+            }
+        }
+    };
+    /**
+    *
+    * Платформа
+    * @memberof game
+    * @type {object}
+    * @namespace game.bat
+    *
+    */
+    game.bat = {
+        /**
+        * Текущая координата платформы по оси x
+        * @memberof game.bat
+        * @type Number
+        *
+        */
+        x: 250,
+        /**
+        * Текущая координата платформы по оси y
+        * @memberof game.bat
+        * @type Number
+        *
+        */
+        y: 258,
+        /**
+        * Максимальная скорость платформы
+        * @memberof game.bat
+        * @type Number
+        *
+        */
+        maxSpeed: 6,
+        /**
+        * Текущая скорость платформы
+        * @memberof game.bat
+        * @type Number
+        *
+        */
+        speed: 0,
+        /**
+        * Ссылка на объект шарика
+        * @memberof game.bat
+        * @type {object}
+        *
+        */
+        ball: game.ball,
+        /**
+        * Ширина платформы
+        * @memberof game.bat
+        * @type Number
+        *
+        */
+        width: 85,
+        /**
+        * Высота платформы
+        * @memberof game.bat
+        * @type Number
+        */
+        height: 18,
+        /**
+        * Метод отталкивания мяча от платформы
+        * @memberof game.bat
+        * @method runBall
+        *
+        */
+        runBall: function() {
+            // мяч отскакивает от платформы
+            if(this.ball) {
+                this.ball.pushOf();
+                // после того, как мяч взлетел
+                this.ball = false;
+            }
+        },
+        /**
+        * Метод вычисления скорости платформы
+        * @memberof game.bat
+        * @method move
+        *
+        */
+        move: function() {
+            this.x += this.speed;
+            //Если мяч на платформе
+            if(this.ball) {
+                this.ball.x += this.speed;
+            }
+        },
+        /**
+        * Метод остановки платформы
+        * @memberof game.bat
+        * @method stop
+        *
+        */
+        stop: function() {
+            //Останавливаем платформу
+            this.speed = 0;
+            //Если мяч на платформе
+            if(this.ball) {
+                this.ball.speed = 0;
+            }
+        }
+    };
+    
+    
+    // Запускать js код по факту загрузки html-страницы
     window.addEventListener("load",function(){
-// По факту загрузки страницы выполняем:
+    //По факту загрузки страницы выполняем:
     game.start();
-});
+    });
+
+
+
+
+
+
+
+
 
